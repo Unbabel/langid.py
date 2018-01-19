@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-IGWeight.py - 
+IGWeight.py -
 Compute IG Weights given a set of tokenized buckets and a feature set
 
 Marco Lui, January 2013
@@ -34,7 +34,7 @@ authors and should not be interpreted as representing official policies, either 
 or implied, of the copyright holder.
 """
 
-import os, sys, argparse 
+import os, sys, argparse
 import csv
 import numpy
 import multiprocessing as mp
@@ -42,11 +42,11 @@ from itertools import tee, imap, islice
 from collections import defaultdict
 from contextlib import closing
 
-from common import unmarshal_iter, MapPool, Enumerator, write_weights, read_features 
+from common import unmarshal_iter, MapPool, Enumerator, write_weights, read_features
 
 def entropy(v, axis=0):
   """
-  Optimized implementation of entropy. This version is faster than that in 
+  Optimized implementation of entropy. This version is faster than that in
   scipy.stats.distributions, particularly over long vectors.
   """
   v = numpy.array(v, dtype='float')
@@ -76,33 +76,33 @@ def setup_pass_IG(features, dist, binarize, suffix):
 
 def pass_IG(buckets):
   """
-  In this pass we compute the information gain for each feature, binarized 
-  with respect to each language as well as unified over the set of all 
-  classes. 
+  In this pass we compute the information gain for each feature, binarized
+  with respect to each language as well as unified over the set of all
+  classes.
 
   @global __features the list of features to compute IG for
   @global __dist the background distribution
   @global __binarize (boolean) compute IG binarized per-class if True
   @global __suffix of files in bucketdir to process
-  @param buckets a list of buckets. Each bucket must be a directory that contains files 
-                 with the appropriate suffix. Each file must contain marshalled 
+  @param buckets a list of buckets. Each bucket must be a directory that contains files
+                 with the appropriate suffix. Each file must contain marshalled
                  (term, event_id, count) triplets.
   """
   global __features, __dist, __binarize, __suffix
-   
+
   # We first tally the per-event frequency of each
   # term in our selected feature set.
   term_freq = defaultdict(lambda: defaultdict(int))
   term_index = defaultdict(Enumerator())
 
   for bucket in buckets:
-		for path in os.listdir(bucket):
-			if path.endswith(__suffix):
-				for key, event_id, count in unmarshal_iter(os.path.join(bucket,path)):
-					# Select only our listed features
-					if key in __features:
-						term_index[key]
-						term_freq[key][event_id] += count
+    for path in os.listdir(bucket):
+      if path.endswith(__suffix):
+        for key, event_id, count in unmarshal_iter(os.path.join(bucket,path)):
+          # Select only our listed features
+          if key in __features:
+            term_index[key]
+            term_freq[key][int(event_id)] += count
 
   num_term = len(term_index)
   num_event = len(__dist)
@@ -228,7 +228,7 @@ if __name__ == "__main__":
     weights_path = os.path.join(args.model, 'IGweights' + suffix + ('.bin' if args.binarize else ''))
 
   # display paths
-  print "model path:", args.model 
+  print "model path:", args.model
   print "buckets path:", bucketlist_paths
   print "features path:", feature_path
   print "weights path:", weights_path
